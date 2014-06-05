@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Student">
+
+  <typeAlias alias="student" type="org.facejava.vo.Student"/>
+  <typeAlias alias="clazz" type="org.facejava.vo.Clazz"/>
+
+  <!-- 
+       表关联通过配置文件的resultMap实现,不需要关联的查询仍可用resultClass
+       -->
+  <resultMap id="studentResult" class="student">
+    <result property="id" column="ID"/>
+    <result property="name" column="NAME"/>
+    <result property="sex" column="SEX"/>
+    <result property="age" column="AGE"/>
+    <result property="clazz" column="CLAZZ_ID" select="getClazzById"/>
+  </resultMap>
+   <!-- 通过TB_STUDENT表中保存的clazz的id实现的多对一关联,
+   ibatis会使用selectClazzById(id)的结果填充clazz属性 -->
+  
+   <resultMap id="clazzResult" class="clazz">
+    <result property="id" column="ID"/>
+    <result property="name" column="NAME"/>
+    <result property="students" column="ID" select="getStudentByClazzId"/>
+  </resultMap>
+  
+   <select id="getAllStudents" resultMap="studentResult">
+    select * from TB_STUDENT
+  </select>
+  
+  <select id="getStudentById" 
+  		parameterClass="java.lang.Integer" 
+  		resultMap="studentResult">   
+    SELECT ID,NAME,SEX,AGE,CLAZZ_ID 
+    FROM TB_STUDENT 
+    WHERE ID = #id# 
+  </select>
+  
+    <select id="getClazzById" parameterClass="java.lang.Integer" resultMap="clazzResult">
+    select
+      ID as id,
+      NAME as name
+    from TB_CLAZZ
+    where ID = #id#
+  </select>
+  
+   <select id="getStudentByClazzId" parameterClass="java.lang.Integer" resultClass="Student">   
+    select id,name,sex,age,clazz_id from tb_student where clazz_id = #id#   
+  </select>
+  
+
+
+</sqlMap>

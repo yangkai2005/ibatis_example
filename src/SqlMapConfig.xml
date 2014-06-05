@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMapConfig      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+	<!-- 
+		 Settings节点参数描述:
+		 1.cacheModelsEnabled 是否启用SqlMapClient 上的缓存机制。建议设为"true" 
+		 2.enhancementEnabled 是否针对POJO 启用字节码增强机制以提升getter/setter的调用效能，
+		 	避免使用Java Reflect 所带来的性能开销。
+		 	同时，这也为Lazy Loading 带来了极大的性能提升。建议设为"true" 
+		 3.lazyLoadingEnabled 是否启用延迟加载机制，建议设为"true" 
+	 -->
+	<settings cacheModelsEnabled="true" 
+			enhancementEnabled="true"
+			lazyLoadingEnabled="true"/>
+
+  <!-- transactionManager 节点定义了ibatis 的事务管理器，目前提供了以下几种选择：
+  		1.JDBC 通过传统JDBC Connection.commit/rollback 实现事务支持。
+		2.JTA 使用容器提供的JTA 服务实现全局事务管理。
+		3.EXTERNAL 外部事务管理， 如在EJB 中使用ibatis，通过EJB 的部署配置即可实现自动的事务管理机制。
+		此时ibatis 将把所有事务委托给外部容器进行管理。
+		此外，通过Spring 等轻量级容器实现事务的配置化管理也是一个不错的选择。
+   -->
+  <transactionManager type="JDBC" commitRequired="false">
+  	<!-- 
+  		dataSource 从属于transactionManager节点，用于设定ibatis 运行期使用的DataSource 属性。
+  		type 属性： dataSource 节点的type属性指定了dataSource 的实现类型。
+		可选项目：
+		1.SIMPLE：
+			SIMPLE 是ibatis 内置的dataSource 实现，其中实现了一个简单的数据库连接池机制，
+			对应ibatis 实现类为com.ibatis.sqlmap.engine.datasource.SimpleDataSourceFactory.
+		2.DBCP:
+			基于Apache DBCP 连接池组件实现的DataSource 封装，当无容器提供DataSource 服务时，建议使用该选项，
+			对应ibatis 实现类为com.ibatis.sqlmap.engine.datasource.DbcpDataSourceFactory.
+		3.JNDI： 
+			使用J2EE容器提供的DataSource实现，DataSource将通过指定的JNDI Name 从容器中获取。
+			对应ibatis 实现类为com.ibatis.sqlmap.engine.datasource.JndiDataSourceFactory。
+  	 -->
+    <dataSource type="SIMPLE">
+      <property name="JDBC.Driver" value="com.mysql.jdbc.Driver"/>
+      <property name="JDBC.ConnectionURL" value="jdbc:mysql://127.0.0.1:3306/ibatis"/>
+      <property name="JDBC.Username" value="root"/>
+      <property name="JDBC.Password" value=""/>
+    </dataSource>
+  </transactionManager>
+
+  <!-- sqlMap 节点指定了映射文件的位置，配置中可出现多个sqlMap 节点，以指定项目内所包含的所有映射文件。 -->
+  <sqlMap resource="org/facejava/vo/User.xml"/>
+  <sqlMap resource="org/facejava/vo/Student.xml"/>
+  <!-- List more here...
+  <sqlMap resource="com/mydomain/data/Order.xml"/>
+  <sqlMap resource="com/mydomain/data/Documents.xml"/>
+  -->
+
+</sqlMapConfig>

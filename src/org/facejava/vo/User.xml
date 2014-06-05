@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 
+	映射文件主要分为两个部分：模块配置和Statement 配置.
+ -->
+<sqlMap namespace="User">
+ <!-- 
+  	模块配置:
+  	typeAlias 节点： 
+		定义了本映射文件中的别名，以避免过长变量值的反复书写，
+		本例中通过typeAlias节点为类"org.facejava.vo.User"定义了一个别名"user", 
+		这样在本配置文件的其他部分，需要引用"org.facejava.vo.User" 类时,只需以其别名替代即可。
+  -->
+	<typeAlias alias="user" type="org.facejava.vo.User"/>
+	
+	  <!-- 返回的集合定义,class是返回集合里面的类,property是类中的属性 -->
+	  <resultMap id="userResult" class="user">
+	    <result property="id" column="ID"/>
+	    <result property="name" column="NAME"/>
+	    <result property="sex" column="SEX"/>
+	  </resultMap>
+	  <!-- 
+	Statement 配置包含了数个与SQL Statement 相关的节点
+	statement,procedure,insert,delete,update,select
+	其中，statement 最为通用，它可以替代其余的所有节点。使用statement 定义所有操作固然可以达成目标，但缺乏直观性.
+	除statement之外的节点各自对应了SQL 中的同名操作（procedure 对应存储过程）
+	通过<insert>、<delete>、<update>、<select>四个节点，
+	我们分别定义了针对TUser 对象的增删改查操作。在这四个节点中，我们指定了对应的SQL语句,
+	insert、update、delete 节点无需返回数据类型定义(总是int)
+	 -->
+	 
+	  <!-- 返回类型是上面的集合定义resultMap id="userResult" -->
+	  <select id="getAllUser" resultMap="userResult">
+		SELECT ID,NAME,SEX
+		FROM TB_USER
+	</select>
+	<!-- 返回类型是上面定义的alias="user" 
+	parameterClass 参数类。指定了参数的完整类名(包括包路径)
+  	resultClass 结果类。指定结果类型的完整类名(包括包路径)
+	-->
+	  <select id="getUserById" parameterClass="java.lang.Integer" resultClass="user">
+		SELECT ID,NAME,SEX
+		FROM TB_USER
+		WHERE ID = #id#
+	</select>
+	
+	<insert id="insertUser" parameterClass="user">
+		INSERT INTO TB_USER(NAME,SEX)
+		VALUES(#name#,#sex#)
+	</insert>
+	
+	<delete id="deleteUserById" parameterClass="java.lang.Integer">
+		DELETE FROM TB_USER
+		WHERE ID = #id#
+	</delete>
+	
+	<delete id="deleteAllUser">
+		DELETE FROM TB_USER
+	</delete>
+	
+	 <!-- update 操作,参数是org.facejava.User
+  	映射文件分析:
+  	1.id="updateUserById",可以在代码中通过指定操作id 来执行此节点所定义的操作，
+  	如：sqlMap.update("updateUserById",user); user为对象.
+  	ID设定使得在一个配置文件中定义两个同名节点成为可能（两个update节点，以不同id 区分） 
+  	2.parameterClass指定了操作所需的参数类型，
+  	本例中update操作以org.facejava.vo.User 类型的对象作为参数，目标是将提供的User实例更新到数据库。
+  	parameterClass="user"中，user 为"org.facejava.vo.User" 类的别名，
+  	别名可通过typeAlias节点指定，如示例配置文件中的：
+	<typeAlias alias="user" type="org.facejava.vo.User"/>
+	3.<update>中间是实际数据库支持的SQL 语句， 将由ibatis 填入参数后交给数据库执行</update>
+	4. SQL 中所需的用户名参数，"#name#"在运行期会由传入的user 对象的name 属性填充.
+	5.对于这个示例，ibatis 在运行期会读取id 为"updateUserById"的update节点的SQL定义,
+	并调用指定的user对象的对应getXXX方法获取属性值,并用此属性值,对SQL中的参数进行填充后提交数据库执行。
+  -->
+	<update id="updateUser" parameterClass="user">
+		UPDATE TB_USER
+		SET
+		NAME = #name#,
+		SEX = #sex#
+		WHERE ID = #id#
+	</update>
+	
+	
+	
+</sqlMap>
